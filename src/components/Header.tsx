@@ -1,9 +1,9 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ShoppingCart, User } from "lucide-react";
 import { useState, useEffect } from "react";
-import OptenixLogo from "../images/Optenix.png";
+import OptenixLogo from "../images/OptenixLogo.png"
 
-export default function Header() {
+ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -186,3 +186,4 @@ export default function Header() {
     </>
   );
 }
+export default Header;

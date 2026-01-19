@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from 'lucide-react';
-import OptenixLogo from "../images/Optenix.png"
+import OptenixLogo from "../images/OptenixLogo.png"
 
 export default function Footer() {
   return (
