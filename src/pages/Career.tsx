@@ -2,8 +2,15 @@
 import { ArrowRight, MapPin, Briefcase, Clock } from "lucide-react";
 import { benefits, openings } from "../data/CareerData";
 import { motion } from "framer-motion";
+import { useRef } from "react";
 
 export default function Career() {
+
+  const openPositionsRef = useRef<HTMLDivElement>(null);
+
+  const scrollToOpenPositions = () => {
+    openPositionsRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
   return (
     <div className="min-h-screen">
 
@@ -26,7 +33,10 @@ export default function Career() {
             <p className="text-xl text-gray-600 mb-8">
               Build the future of technology with talented people who share your passion for innovation.
             </p>
-            <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-xl transition-shadow flex items-center space-x-2 mx-auto">
+            <button
+              onClick={scrollToOpenPositions} // Scroll to Open Positions section
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg font-semibold hover:shadow-xl transition-shadow flex items-center space-x-2 mx-auto"
+            >
               <span>View Open Positions</span>
               <ArrowRight className="w-5 h-5" />
             </button>
@@ -130,6 +140,7 @@ export default function Career() {
 
       {/* Open Positions Section */}
       <motion.section
+      ref = {openPositionsRef}
         className="py-20 bg-gradient-to-br from-gray-50 to-blue-50"
         initial="hidden"
         whileInView="visible"

@@ -31,8 +31,15 @@ export default function Register() {
   };
 
   const validatePasswords = (pass: string, confirmPass: string) => {
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+
     if (!pass || !confirmPass) {
       setPasswordError("");
+      return false;
+    }
+
+    if (!specialCharRegex.test(pass)) {
+      setPasswordError("Password must contain at least one special character");
       return false;
     }
 
@@ -120,6 +127,7 @@ export default function Register() {
               value={password}
               onChange={handlePasswordChange}
               className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 pr-12"
+              required
             />
             <button
               type="button"
@@ -138,6 +146,7 @@ export default function Register() {
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
               className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 pr-12"
+              required
             />
             <button
               type="button"

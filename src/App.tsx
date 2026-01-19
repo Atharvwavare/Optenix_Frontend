@@ -13,6 +13,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Services from './pages/Services';
 import Login from "./authenticate/Login";
 import Register from './authenticate/Register';
+import CartPage from './pages/CartPage';
 
 function App() {
   return (
@@ -20,20 +21,24 @@ function App() {
       <Header />
 
       <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/blogs" element={<Blogs />} />
-          <Route path="/career" element={<Career />} />
-          <Route path='/services' element={<Services/>}/>
-          <Route path="/contact" element={<Contact />} />
+       <Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/about" element={<About />} />
+  <Route path="/shop" element={<Shop />} />
+  <Route path="/blogs" element={<Blogs />} />
+  <Route path="/career" element={<Career />} />
+  <Route path='/services' element={<Services/>}/>
+  <Route path="/contact" element={<Contact />} />
 
-          <Route path="/shop/:id" element={<ProductDetails />} />
+  <Route path="/shop/:id" element={<ProductDetails />} />
+  
+  {/* Add this route for the cart page */}
+  <Route path="/cart" element={<CartPage />} />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
+  <Route path="/login" element={<Login />} />
+  <Route path="/register" element={<Register />} />
+</Routes>
+
       </main>
 
       <Footer />

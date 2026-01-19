@@ -65,7 +65,7 @@ export const services: ServiceGroup[] = [
       },
       {
         title: "IT & Services",
-        desc: "From web & mobile apps to IT infrastructure, we handle your technology end-to-end.",
+        desc: "We provide Web Development, CRM Development, and App Development services. From web and mobile applications to complete IT infrastructure solutions, we handle your technology needs end-to-end.",
       },
     ],
   },

@@ -28,9 +28,9 @@ export default function ImageCarousel() {
   };
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-6">
-        <div className="relative max-w-6xl mx-auto rounded-3xl overflow-hidden shadow-2xl">
+    <section className="py-20 w-full bg-white">
+      <div className="container mx-auto px-10">
+        <div className="relative max-w-8xl mx-auto rounded-3xl overflow-hidden shadow-2xl">
 
           {/* Slides */}
           <div

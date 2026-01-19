@@ -1,13 +1,15 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ShoppingCart, User } from "lucide-react";
 import { useState, useEffect } from "react";
-import OptenixLogo from "../images/OptenixLogo.png"
+import OptenixLogo from "../images/OptenixLogo.png";
+import { useCart } from "../context/CartContext";
 
- function Header() {
+function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { cartItems } = useCart(); // Get cart items from context
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,35 +50,34 @@ import OptenixLogo from "../images/OptenixLogo.png"
             </Link>
 
             {/* DESKTOP NAV */}
-           {/* DESKTOP NAV */}
-<div className="hidden md:flex items-center space-x-10">
-  {navLinks.map((link) => (
-    <Link
-      key={link.path}
-      to={link.path}
-      className={`relative font-semibold transition-colors ${
-        scrolled
-          ? isActive(link.path)
-            ? "text-blue-600"
-            : "text-gray-800 hover:text-blue-600"
-          : isActive(link.path)
-          ? "text-white"
-          : "text-gray-200 hover:text-white"
-      }`}
-    >
-      {link.name}
+            <div className="hidden md:flex items-center space-x-10">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`relative font-semibold transition-colors ${
+                    scrolled
+                      ? isActive(link.path)
+                        ? "text-blue-600"
+                        : "text-gray-800 hover:text-blue-600"
+                      : isActive(link.path)
+                      ? "text-white"
+                      : "text-gray-200 hover:text-white"
+                  }`}
+                >
+                  {link.name}
 
-      {/* UNDERLINE */}
-      <span
-        className={`absolute left-0 -bottom-1 h-[2px] w-full bg-blue-600 transform transition-transform duration-300 origin-left ${
-          isActive(link.path)
-            ? "scale-x-100"
-            : "scale-x-0 hover:scale-x-100"
-        }`}
-      />
-    </Link>
-  ))}
-</div>
+                  {/* UNDERLINE */}
+                  <span
+                    className={`absolute left-0 -bottom-1 h-[2px] w-full bg-blue-600 transform transition-transform duration-300 origin-left ${
+                      isActive(link.path)
+                        ? "scale-x-100"
+                        : "scale-x-0 hover:scale-x-100"
+                    }`}
+                  />
+                </Link>
+              ))}
+            </div>
 
             {/* ACTIONS */}
             <div className="flex items-center gap-5">
@@ -96,15 +97,20 @@ import OptenixLogo from "../images/OptenixLogo.png"
 
               {/* CART (Desktop only) */}
               <button
-                 onClick={()=> navigate("/shop")}
-                className={`hidden md:flex items-center gap-2 transition-colors ${
-                  scrolled
-                    ? "text-gray-800 hover:text-blue-600"
-                    : "text-white"
+                onClick={() => navigate("/cart")}
+                className={`relative hidden md:flex items-center gap-2 transition-colors ${
+                  scrolled ? "text-gray-800 hover:text-blue-600" : "text-white"
                 }`}
               >
                 <ShoppingCart className="w-5 h-5" />
                 <span>Cart</span>
+
+                {/* Cart Badge */}
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                    {cartItems.reduce((total, item) => total + item.quantity, 0)}
+                  </span>
+                )}
               </button>
 
               {/* HAMBURGER */}
@@ -176,9 +182,16 @@ import OptenixLogo from "../images/OptenixLogo.png"
             Login
           </button>
 
-          {/* CTA */}
-          <button className="w-full mt-3 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg font-semibold">
-            Get Started
+          {/* CART BUTTON */}
+          <button
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigate("/cart");
+            }}
+            className="w-full mt-3 py-3 flex items-center justify-center gap-2 border border-blue-600 text-blue-600 rounded-lg font-semibold"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            Cart ({cartItems.reduce((total, item) => total + item.quantity, 0)})
           </button>
 
         </div>
@@ -186,4 +199,6 @@ import OptenixLogo from "../images/OptenixLogo.png"
     </>
   );
 }
+
 export default Header;
+  

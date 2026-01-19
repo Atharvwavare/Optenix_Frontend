@@ -16,7 +16,7 @@ export default function Shop() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query.trim().toLowerCase());
-    }, 150); // tuned for speed + stability
+    }, 150);
 
     return () => clearTimeout(timer);
   }, [query]);
@@ -89,8 +89,9 @@ export default function Shop() {
             {filteredProducts.map((product, index) => (
               <motion.div
                 key={product.id}
+                onClick={() => navigate(`/shop/${product.id}`)}
                 className="bg-white rounded-2xl border shadow-sm hover:shadow-xl
-                           p-4 flex flex-col transition"
+                           p-4 flex flex-col transition cursor-pointer"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -139,7 +140,10 @@ export default function Shop() {
 
                 {/* Action */}
                 <button
-                  onClick={() => navigate(`/shop/${product.id}`)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // prevent double navigation
+                    navigate(`/shop/${product.id}`);
+                  }}
                   className="mt-auto bg-blue-600 hover:bg-blue-700 text-white
                              font-semibold py-2 rounded-full transition"
                 >
