@@ -6,6 +6,7 @@ export default function Services() {
   return (
     <section className="bg-slate-50 py-16">
       <div className="max-w-7xl mx-auto px-4">
+        {/* Services page 1 */}
         {/* Heading */}
         <motion.div
           className="text-center mb-14"
@@ -28,7 +29,8 @@ export default function Services() {
           </h1>
         </motion.div>
 
-        {/* Service Sections */}
+        {/* Services page 2 */}
+        {/* Service data cards */}
         {services.map((group, idx) => (
           <motion.div
             key={idx}
@@ -72,7 +74,8 @@ export default function Services() {
           </motion.div>
         ))}
 
-        {/* CTA Buttons */}
+        {/* Services page 3 */}
+        {/* Get a free Quote */}
         <motion.div
           className="flex flex-col sm:flex-row justify-center gap-4 mt-10"
           initial={{ opacity: 0, y: 20 }}
@@ -82,9 +85,6 @@ export default function Services() {
         >
           <button className="px-6 py-3 rounded-lg bg-blue-700 text-white font-medium hover:bg-blue-800 transition">
             Get a Free Quote
-          </button>
-          <button className="px-6 py-3 rounded-lg border border-blue-700 text-blue-700 font-medium hover:bg-blue-50 transition">
-            Request a Demo
           </button>
         </motion.div>
       </div>

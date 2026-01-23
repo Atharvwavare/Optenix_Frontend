@@ -4,6 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 
 export default function Contact() {
+
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -48,7 +50,7 @@ export default function Contact() {
     {
       icon: <Mail className="w-6 h-6" />,
       title: "Email",
-      details: "sneha.sahare@optenix.in   vinayak.raut@optenix.in",
+      details: "sneha.sahare@optenix.in\nvinayak.raut@optenix.in",
       subtext: "We will respond within 24 hours",
     },
     {
@@ -62,7 +64,8 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen overflow-hidden">
-      {/* Hero Section */}
+      {/* Contact page 1 */}
+      {/* Get in Touch */}
       <motion.section
         className="relative bg-gradient-to-br from-blue-50 via-white to-cyan-50 py-20"
         initial={{ opacity: 0, y: -50 }}
@@ -86,7 +89,8 @@ export default function Contact() {
         </div>
       </motion.section>
 
-      {/* Contact Info */}
+      {/* Contact page 2 */}
+      {/* Contact Details */}
       <motion.section
         className="py-20 bg-white"
         initial="hidden"
@@ -114,7 +118,7 @@ export default function Contact() {
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   {info.title}
                 </h3>
-                <p className="text-gray-900 font-medium mb-1">{info.details}</p>
+                <p className="text-gray-900 font-medium mb-1 whitespace-pre-line">{info.details}</p>
                 <p className="text-md text-gray-600">{info.subtext}</p>
               </motion.div>
             ))}
@@ -158,7 +162,7 @@ export default function Contact() {
                   } else if (field === "message") {
                     return (
                       <div key={idx}>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-black mb-2">
                           Message
                         </label>
                         <textarea
@@ -210,7 +214,7 @@ export default function Contact() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              <h2 className="text-3xl font-bold text-black mb-6">
                 Why Contact Us?
               </h2>
               <motion.div
@@ -257,7 +261,7 @@ export default function Contact() {
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
                         {item.title}
                       </h3>
-                      <p className="text-gray-600">{item.desc}</p>
+                      <p className="text-black">{item.desc}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -270,7 +274,7 @@ export default function Contact() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                <h3 className="text-xl font-semibold text-black mb-3">
                   Business Hours
                 </h3>
                 <div className="space-y-2 text-gray-600">
@@ -284,7 +288,8 @@ export default function Contact() {
         </div>
       </motion.section>
 
-      {/* Map Section */}
+      {/* Contact page 3 */}
+      {/* Goggle Map  */}
       <motion.section
         className="py-12 bg-gray-50"
         initial={{ opacity: 0 }}

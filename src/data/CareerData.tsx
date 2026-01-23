@@ -1,4 +1,3 @@
-// src/data/CareerData.ts
 import { ReactNode } from "react";
 import { Heart, TrendingUp, Users, Award } from "lucide-react";
 
@@ -32,12 +31,14 @@ export const benefits: Benefit[] = [
   {
     icon: <Users className="w-8 h-8" />,
     title: "Great Team",
-    description: "Work with talented, passionate people in a collaborative environment.",
+    description:
+      "Work with talented, passionate people in a collaborative environment.",
   },
   {
     icon: <Award className="w-8 h-8" />,
     title: "Competitive Pay",
-    description: "Industry-leading salaries, bonuses, and equity opportunities.",
+    description:
+      "Industry-leading salaries, bonuses, and equity opportunities.",
   },
 ];
 

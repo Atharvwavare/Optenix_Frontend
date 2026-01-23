@@ -2,7 +2,7 @@
 
 import ptzCamera from "../images/optenix_4k_ptz_camera.jpeg";
 import flatPanel from "../images/interactive_flat_panel.png";
-import microphones from "../images/Dual_microphones.png"
+import microphones from "../images/Dual_microphones.png";
 
 export const products = [
   {
@@ -36,17 +36,23 @@ export const products = [
     ],
   },
   {
-    name: "Dual GooseNeck Microphones",
+    name: "Digital Podium",
     image: microphones,
     specifications: [
-      "Touch Control Panel",
-      "Integrated Mic System",
+      "P-Cap Touch",
+      "Embedded 13000Ah Battery with 5 hours battery life",
       "HDMI & USB Ports",
-      "Built-in Amplifier",
-      "Lockable Storage",
-            "RAM: 8 GB",
-      "Storage (ROM): 128 GB",
-
+      "Wired and Wireless Screen-Sharing",
+      "OnStage Annotation",
+      "Smart Lectern",
+      "CPU: ARM Octa Core A76*4 + A55*4",
+      "Screen Size: 27",
+      "Resolution: 3840*2160(UHD)",
+      "Stands: 1130mm-1326mm",
+      "System: Android 13.0",
+      "Working Frequency: 2.4G + 1.8G",
+      "ROM: 64GB",
+      "RAM: 8GB",
     ],
   },
 ];

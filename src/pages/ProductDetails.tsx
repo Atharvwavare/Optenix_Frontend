@@ -5,11 +5,16 @@ import { useState, useEffect, useMemo } from "react";
 import { products, Product } from "../data/ProductsData";
 import { useCart } from "../context/CartContext";
 
+import CartPopup from "../others/CartPopup";
+
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [qty, setQty] = useState(1);
+
+  const [showPopup, setShowPopup] = useState(false);
+
 
   // -------------------- Search --------------------
   const [query, setQuery] = useState("");
@@ -25,7 +30,7 @@ export default function ProductDetails() {
   const filteredProducts = useMemo(() => {
     if (!debouncedQuery) return [];
     return products.filter((product) =>
-      product.name.toLowerCase().includes(debouncedQuery)
+      product.name.toLowerCase().includes(debouncedQuery),
     );
   }, [debouncedQuery]);
 
@@ -44,15 +49,22 @@ export default function ProductDetails() {
 
   // -------------------- Handlers --------------------
   const handleAddToCart = () => {
-    addToCart({
-      id: Number(product.id),
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: qty,
-    });
-    alert("Product added to cart");
-  };
+  addToCart({
+    id: Number(product.id),
+    name: product.name,
+    price: product.price,
+    image: product.image,
+    quantity: qty,
+  });
+
+  setShowPopup(true);
+
+  setTimeout(() => {
+    setShowPopup(false);
+  },3000);
+};
+
+
 
   const handleBuyNow = () => {
     addToCart({
@@ -68,7 +80,6 @@ export default function ProductDetails() {
   return (
     <section className="min-h-screen bg-white py-20">
       <div className="container mx-auto px-6">
-
         {/* -------------------- Search Bar -------------------- */}
         <div className="max-w-xl mx-auto mb-10 relative">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -93,8 +104,14 @@ export default function ProductDetails() {
                 onClick={() => navigate(`/shop/${p.id}`)}
                 className="bg-white rounded-xl border shadow-sm p-3 cursor-pointer hover:shadow-lg transition"
               >
-                <img src={p.image} alt={p.name} className="h-28 object-contain mx-auto mb-2" />
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">{p.name}</h3>
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  className="h-28 object-contain mx-auto mb-2"
+                />
+                <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                  {p.name}
+                </h3>
                 <div className="text-blue-900 font-bold">₹{p.price}</div>
               </div>
             ))}
@@ -103,7 +120,6 @@ export default function ProductDetails() {
 
         {/* -------------------- Product Details -------------------- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start mb-10">
-
           {/* Main Product Image */}
           <div className="border rounded-xl p-6 flex justify-center bg-gray-50">
             <img
@@ -129,12 +145,16 @@ export default function ProductDetails() {
                   }`}
                 />
               ))}
-              <span className="text-blue-600 ml-2">{product.rating.toFixed(1)}</span>
+              <span className="text-blue-600 ml-2">
+                {product.rating.toFixed(1)}
+              </span>
             </div>
 
             {/* Price */}
             <div className="flex items-center gap-4 mb-3">
-              <span className="text-3xl font-bold text-blue-800">₹{product.price}</span>
+              <span className="text-3xl font-bold text-blue-800">
+                ₹{product.price}
+              </span>
               {product.originalPrice && (
                 <span className="line-through text-black text-lg">
                   ₹{product.originalPrice}
@@ -143,26 +163,41 @@ export default function ProductDetails() {
             </div>
 
             {product.discount && (
-              <p className="text-green-600 font-semibold mb-4">{product.discount}</p>
+              <p className="text-green-600 font-semibold mb-4">
+                {product.discount}
+              </p>
             )}
 
             <p className="text-gray-700 mb-6">{product.description}</p>
 
             {/* Quantity */}
-            <div className="flex items-center gap-3 mb-6">
-              <span className="font-medium">Quantity:</span>
-              <select
-                value={qty}
-                onChange={(e) => setQty(Number(e.target.value))}
-                className="border rounded px-3 py-1"
-              >
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <div className="flex items-center gap-4 mb-6">
+  <span className="font-medium">Quantity:</span>
+
+  <div className="flex items-center border rounded-lg overflow-hidden">
+    {/* Minus Button */}
+    <button
+      onClick={() => setQty((prev) => (prev > 1 ? prev - 1 : 1))}
+      className="px-4 py-2 text-xl font-bold text-gray-700 hover:bg-gray-100"
+    >
+      −
+    </button>
+
+    {/* Quantity Display */}
+    <span className="px-6 py-2 text-lg font-semibold select-none">
+      {qty}
+    </span>
+
+    {/* Plus Button */}
+    <button
+      onClick={() => setQty((prev) => prev + 1)}
+      className="px-4 py-2 text-xl font-bold text-gray-700 hover:bg-gray-100"
+    >
+      +
+    </button>
+  </div>
+</div>
+
 
             {/* Buttons */}
             <div className="flex gap-4 mb-6 flex-wrap">
@@ -209,6 +244,8 @@ export default function ProductDetails() {
             </div>
           ))}
         </div>
+        {showPopup && <CartPopup onClose={() => setShowPopup(false)} />}
+
       </div>
     </section>
   );

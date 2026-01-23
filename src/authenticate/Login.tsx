@@ -73,7 +73,7 @@ const handleSubmit = (e: React.FormEvent) => {
 
   // 🔥 TEST LOGIN DATA (FRONTEND ONLY)
 const fakeUser = {
-  name: "Atharv",
+  name: "User",
   email: email,
   role: "user" as "user",   // 👈 FIX
 };

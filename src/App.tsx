@@ -24,6 +24,11 @@ import Profile from './authenticate/Profile';
 import BuyNowPage from './pages/BuyNowPage';
 
 
+
+
+
+
+
 function App() {
   
   return (
@@ -39,6 +44,8 @@ function App() {
   <Route path="/about" element={<About />} />
   <Route path="/shop" element={<Shop />} />
   <Route path="/blogs" element={<Blogs />} />
+ 
+
   <Route path="/career" element={<Career />} />
   <Route path='/services' element={<Services/>}/>
   <Route path="/contact" element={<Contact />} />
@@ -58,6 +65,9 @@ function App() {
           <Route path="/admin" element={<Admin />} />
 
           <Route path='/profile' element={<Profile/>}/>
+
+  
+
 
 </Routes>
 

@@ -1,4 +1,3 @@
-// src/pages/Career.tsx
 import { ArrowRight, MapPin, Briefcase, Clock } from "lucide-react";
 import { benefits, openings } from "../data/CareerData";
 import { motion } from "framer-motion";
@@ -14,7 +13,8 @@ export default function Career() {
   return (
     <div className="min-h-screen overflow-hidden">
 
-      {/* Hero Section */}
+      {/* Career Page 1 */}
+      {/* Join Our Amazing Team */}
       <motion.section
         className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 py-20"
         initial={{ opacity: 0, y: -50 }}
@@ -44,7 +44,8 @@ export default function Career() {
         </div>
       </motion.section>
 
-      {/* Why Work Section */}
+      {/* Career Page 2 */}
+      {/* Why Work at Optenix */}
       <motion.section
         className="py-20 bg-white"
         initial="hidden"
@@ -137,7 +138,8 @@ export default function Career() {
         </div>
       </motion.section>
 
-      {/* Open Positions Section */}
+      {/* Career Page 3 */}
+      {/*  Benefits and Perks */}
       <motion.section
       ref = {openPositionsRef}
         className="py-20 bg-gradient-to-br from-gray-50 to-blue-50"
@@ -222,7 +224,8 @@ export default function Career() {
         </div>
       </motion.section>
 
-      {/* CTA Section */}
+       {/* Career Page 4 */}
+      {/*  Current Openings */}
       <motion.section
         className="py-20 bg-gradient-to-r from-blue-600 to-cyan-500 text-white"
         initial={{ opacity: 0, y: 30 }}
