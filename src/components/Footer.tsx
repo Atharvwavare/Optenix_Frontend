@@ -97,7 +97,7 @@ export default function Footer() {
 
           <div>
             <h3 className="text-white font-semibold mb-4">Contact Info</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-3 cursor-pointer">
               <li className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <span className="text-sm">Geras Imperium Rise, Near Wipro Circle Metro Station, Hinjewadi Phase II, Pune, Maharashtra</span>

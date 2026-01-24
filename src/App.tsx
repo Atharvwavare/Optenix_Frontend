@@ -19,9 +19,11 @@ import Admin from "./authenticate/Admin";
 
 import ScrollToTop from './others/ScrollToTop';
 
-import Dashboard from './authenticate/Dashboard';
+
 import Profile from './authenticate/Profile';
-import BuyNowPage from './pages/BuyNowPage';
+
+import PlaceOrder from "./pages/PlaceOrder";
+import ConfirmPayment from "./pages/ConfirmPayment";
 
 
 
@@ -58,10 +60,11 @@ function App() {
   <Route path="/login" element={<Login />} />
   <Route path="/register" element={<Register />} />
 
-  <Route path='/buy-now' element={<BuyNowPage/>}/>
+   <Route path="/place-order" element={<PlaceOrder />} />
+<Route path="/confirm-order" element={<ConfirmPayment />} />
   {/* AFTER LOGIN */}
           <Route path="/home" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+         
           <Route path="/admin" element={<Admin />} />
 
           <Route path='/profile' element={<Profile/>}/>

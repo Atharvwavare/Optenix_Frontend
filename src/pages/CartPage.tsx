@@ -14,7 +14,7 @@ export default function CartPage() {
   );
 
   // Update quantity using + / - buttons
-  const updateQuantity = (id: number, newQty: number) => {
+  const updateQuantity = (id: string, newQty: number) => {
     const item = cartItems.find((i) => i.id === id);
     if (!item || newQty < 1) return;
 
@@ -62,7 +62,7 @@ export default function CartPage() {
                   </h3>
 
                   <div className="flex items-center gap-1 mt-1">
-                    {[...Array(5)].map((_, i) => (
+                    {[...Array(6)].map((_, i) => (
                       <Star
                         key={i}
                         className="w-4 h-4 fill-blue-400 text-blue-400"
@@ -133,7 +133,7 @@ export default function CartPage() {
             </div>
 
             <button
-              onClick={() => navigate("/buy-now")}
+              onClick={() => navigate("/place-order")}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 font-semibold rounded mb-3 transition"
             >
               Buy Now

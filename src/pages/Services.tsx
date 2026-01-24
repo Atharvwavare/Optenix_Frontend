@@ -83,9 +83,15 @@ export default function Services() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <button className="px-6 py-3 rounded-lg bg-blue-700 text-white font-medium hover:bg-blue-800 transition">
-            Get a Free Quote
-          </button>
+          <a
+  href="https://docs.google.com/forms/d/e/1FAIpQLSdOsNrVjj5kOiI2SAdrRhXLXkHHYEFZnTO0urGXuoQq5IAYiA/viewform"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-700 text-white font-medium hover:bg-blue-800 transition"
+>
+Get a Free Quote
+</a>
+
         </motion.div>
       </div>
     </section>
