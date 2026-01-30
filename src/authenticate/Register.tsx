@@ -5,6 +5,8 @@ import { useState } from "react";
 export default function Register() {
   const navigate = useNavigate();
 
+
+  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,15 +16,15 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL;
+   // 🔹 Use same API URL for frontend and backend
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
 
-    if (!API_URL) {
-      alert("API URL not configured");
-      return;
-    }
+    
 
     if (password !== confirmPassword) {
       alert("Passwords do not match");
@@ -49,8 +51,6 @@ export default function Register() {
         const text = await res.text();
         throw new Error(text || "Registration failed");
       }
-
-      const data = await res.json();
 
       alert("Registered successfully");
       navigate("/login");
