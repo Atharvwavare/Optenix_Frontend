@@ -17,9 +17,11 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const API_URL = "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL;;
 
 
+
+  // handlesubmit logic
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -61,12 +63,13 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2b0057] to-[#2f1fff] px-4">
       <div className="bg-white p-8 rounded-lg w-full max-w-md shadow">
         <h2 className="text-2xl font-bold mb-6 text-center">
           Register
         </h2>
 
+    {/* REGISTER FORM */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
@@ -132,6 +135,7 @@ export default function Register() {
           </button>
         </form>
 
+    {/* TAGLINE */}
         <p className="text-center mt-4">
           Already have an account?{" "}
           <Link to="/login" className="text-blue-600">

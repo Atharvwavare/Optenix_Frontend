@@ -21,12 +21,6 @@ export default function PlaceOrder() {
 
   const [sameAsBilling, setSameAsBilling] = useState(false);
 
-  // -------------------- OTP STATE --------------------
-  const [otpSent, setOtpSent] = useState(false);
-  const [generatedOtp, setGeneratedOtp] = useState("");
-  const [enteredOtp, setEnteredOtp] = useState("");
-  const [otpVerified, setOtpVerified] = useState(false);
-
   // -------------------- ERROR STATE --------------------
   const [errors, setErrors] = useState({
     billingAddress: "",
@@ -53,25 +47,6 @@ export default function PlaceOrder() {
   // -------------------- FORM HANDLER --------------------
   const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  // -------------------- OTP LOGIC --------------------
-  const sendOtp = () => {
-    if (!form.mobile || form.mobile.length < 10) return;
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(otp);
-    setOtpSent(true);
-    setOtpVerified(false);
-
-    alert("OTP sent (Demo OTP in console)");
-    console.log("DEMO OTP:", otp);
-  };
-
-  const verifyOtp = () => {
-    if (enteredOtp === generatedOtp) {
-      setOtpVerified(true);
-    }
   };
 
   // -------------------- CURRENT LOCATION --------------------
@@ -119,7 +94,7 @@ export default function PlaceOrder() {
     }
 
     setErrors(newErrors);
-    if (hasError || !otpVerified) return;
+    if (hasError) return;
 
     const finalData = {
       ...form,
@@ -160,46 +135,13 @@ export default function PlaceOrder() {
             className="w-full mb-3 border px-3 py-2 rounded"
           />
 
-          {/* MOBILE + OTP */}
-         {/* MOBILE + OTP */}
-<div className="flex flex-col sm:flex-row gap-2 mb-3">
-  <input
-    name="mobile"
-    value={form.mobile}
-    onChange={handleChange}
-    placeholder="Mobile Number"
-    className="flex-1 border px-3 py-2 rounded"
-  />
-  <button
-    onClick={sendOtp}
-    className="bg-blue-600 text-white px-4 py-2 rounded w-full sm:w-auto"
-  >
-    Send OTP
-  </button>
-</div>
-
-
-          {otpSent && !otpVerified && (
-  <div className="flex flex-col sm:flex-row gap-2 mb-3">
-    <input
-      value={enteredOtp}
-      onChange={(e) => setEnteredOtp(e.target.value)}
-      placeholder="Enter OTP"
-      className="flex-1 border px-3 py-2 rounded"
-    />
-    <button
-      onClick={verifyOtp}
-      className="bg-green-600 text-white px-4 py-2 rounded w-full sm:w-auto"
-    >
-      Verify
-    </button>
-  </div>
-)}
-
-
-          {otpVerified && (
-            <p className="text-green-600 mb-3">Mobile Verified</p>
-          )}
+          <input
+            name="mobile"
+            value={form.mobile}
+            onChange={handleChange}
+            placeholder="Mobile Number"
+            className="w-full mb-3 border px-3 py-2 rounded"
+          />
 
           {/* BILLING ADDRESS */}
           <textarea
@@ -214,7 +156,6 @@ export default function PlaceOrder() {
               errors.billingAddress ? "border-red-500" : ""
             }`}
           />
-
           {errors.billingAddress && (
             <p className="text-red-600 text-sm mb-2">
               {errors.billingAddress}
@@ -262,7 +203,6 @@ export default function PlaceOrder() {
                   errors.shippingAddress ? "border-red-500" : ""
                 }`}
               />
-
               {errors.shippingAddress && (
                 <p className="text-red-600 text-sm mb-2">
                   {errors.shippingAddress}
@@ -272,25 +212,20 @@ export default function PlaceOrder() {
           )}
 
           {/* CONTINUE */}
-          <button type="submit"
+          <button
+            type="submit"
             onClick={handleContinue}
-            disabled={!otpVerified}
-            className={`mt-4 w-full py-3 rounded font-semibold text-white
-              ${
-                otpVerified
-                  ? "bg-blue-600 hover:bg-blue-700"
-                  : "bg-gray-400 cursor-not-allowed"
-              }`}
+            className="mt-4 w-full py-3 rounded font-semibold text-white bg-blue-600 hover:bg-blue-700"
           >
             Continue to Confirm Order
           </button>
 
-           <button
-              onClick={() => navigate("/cart")}
-              className="w-full mt-4 text-blue-600 hover:underline"
-            >
-              ← Continue Shopping
-            </button>
+          <button
+            onClick={() => navigate("/cart")}
+            className="w-full mt-4 text-blue-600 hover:underline"
+          >
+            ← Continue Shopping
+          </button>
         </div>
 
         {/* RIGHT */}

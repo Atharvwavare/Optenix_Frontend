@@ -25,5 +25,4 @@ export const baseProducts: Product[] = [
       "Compatible with Android & Windows",
     ],
   },
-
 ];

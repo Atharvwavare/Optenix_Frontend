@@ -20,7 +20,6 @@ import Profile from "./authenticate/Profile";
 import PlaceOrder from "./pages/PlaceOrder";
 import ConfirmPayment from "./pages/ConfirmPayment";
 import PaymentPage from "./pages/PaymentPage";
-import Account from "./authenticate/Account";
 
 import ScrollToTop from "./others/ScrollToTop";
 import ProtectedRoute from "./routes/ProtectedRoutes";
@@ -55,7 +54,6 @@ function App() {
           {/* Authentication */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/account" element={<Account />} />
           <Route path="/profile" element={<Profile />} />
 
           {/* Orders */}
@@ -95,13 +93,4 @@ function App() {
   );
 }
 
- 
 export default App;
-
-
-
-
-
-
-
-

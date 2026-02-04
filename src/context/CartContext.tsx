@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { useAuth } from "./AuthContext";   // ⭐ IMPORT AUTH
 
 export interface CartItem {
   id: string;
@@ -19,20 +20,36 @@ const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
 
-  // 🔥 Load cart from localStorage on first load
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    const savedCart = localStorage.getItem("cart");
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
+  const { user } = useAuth();   // ⭐ GET LOGGED USER
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // 🔥 Save cart to localStorage whenever it changes
+  // ⭐ Load cart when user changes
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (!user?.email) {
+      setCartItems([]);
+      return;
+    }
 
+    const savedCart = localStorage.getItem(`cart_${user.email}`);
+    setCartItems(savedCart ? JSON.parse(savedCart) : []);
+
+  }, [user]);
+
+  // ⭐ Save cart when cart changes
+  useEffect(() => {
+    if (!user?.email) return;
+
+    localStorage.setItem(
+      `cart_${user.email}`,
+      JSON.stringify(cartItems)
+    );
+  }, [cartItems, user]);
+
+  // ---------------- ADD ----------------
   const addToCart = (item: CartItem) => {
     setCartItems(prev => {
       const existing = prev.find(p => p.id === item.id);
+
       if (existing) {
         return prev.map(p =>
           p.id === item.id
@@ -40,21 +57,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
             : p
         );
       }
+
       return [...prev, item];
     });
   };
 
+  // ---------------- REMOVE ----------------
   const removeFromCart = (id: string) => {
     setCartItems(prev => prev.filter(item => item.id !== id));
   };
 
+  // ---------------- CLEAR ----------------
   const clearCart = () => {
     setCartItems([]);
-    localStorage.removeItem("cart");   // 🔥 also clear storage
+
+    if (user?.email) {
+      localStorage.removeItem(`cart_${user.email}`);
+    }
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider
+      value={{ cartItems, addToCart, removeFromCart, clearCart }}
+    >
       {children}
     </CartContext.Provider>
   );

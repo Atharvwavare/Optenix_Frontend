@@ -35,7 +35,7 @@ export default function Shop() {
   const filteredProducts = useMemo(() => {
     if (!debouncedQuery) return products;
     return products.filter((product) =>
-      product.name.toLowerCase().includes(debouncedQuery)
+      product.name.toLowerCase().includes(debouncedQuery),
     );
   }, [debouncedQuery, products]);
 
@@ -43,7 +43,6 @@ export default function Shop() {
   return (
     <section className="min-h-screen bg-gradient-to-b from-white to-blue-50 py-20">
       <div className="container mx-auto px-6">
-
         {/* Title */}
         <motion.div
           className="text-center mb-12"
@@ -80,7 +79,9 @@ export default function Shop() {
 
         {/* Loading */}
         {loading && (
-          <p className="text-center text-lg text-gray-500">Loading products...</p>
+          <p className="text-center text-lg text-gray-500">
+            Loading products...
+          </p>
         )}
 
         {/* No Results */}
@@ -104,9 +105,10 @@ export default function Shop() {
           >
             {filteredProducts.map((product, index) => {
               // ✅ Ensure rating is a number
-              const rating = typeof product.rating === "number"
-                ? product.rating
-                : parseFloat(product.rating as any) || 0;
+              const rating =
+                typeof product.rating === "number"
+                  ? product.rating
+                  : parseFloat(product.rating as any) || 0;
 
               return (
                 <motion.div

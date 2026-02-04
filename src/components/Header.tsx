@@ -73,7 +73,6 @@ function Header() {
         {/* FIXED WIDTH CONTAINER */}
         <nav className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-
             {/* LOGO (fixed height always, no jump) */}
             <img
               src={scrolled ? OptenixBlackLogo : OptenixLogo}
@@ -94,8 +93,8 @@ function Header() {
                         ? "text-blue-600"
                         : "text-gray-800 hover:text-blue-600"
                       : isActive(link.path)
-                      ? "text-white"
-                      : "text-gray-200 hover:text-white"
+                        ? "text-white"
+                        : "text-gray-200 hover:text-white"
                   }`}
                 >
                   {link.name}
@@ -112,7 +111,6 @@ function Header() {
 
             {/* RIGHT ACTIONS */}
             <div className="flex items-center gap-5 relative">
-
               {/* USER LOGIN / PROFILE */}
               {!user ? (
                 <button
@@ -144,7 +142,9 @@ function Header() {
                   {showUserMenu && (
                     <div className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
                       <div className="p-4 border-b">
-                        <p className="font-semibold text-gray-800">{user.name}</p>
+                        <p className="font-semibold text-gray-800">
+                          {user.name}
+                        </p>
                         <p className="text-sm text-gray-500">{user.email}</p>
                       </div>
 
@@ -153,7 +153,7 @@ function Header() {
                           setShowUserMenu(false);
                           navigate("/profile");
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-gray-100 text-gray-700"
+                        className="w-full text-left px-4 py-3 hover:bg-gray-100 text-black"
                       >
                         My Profile
                       </button>
@@ -173,18 +173,22 @@ function Header() {
               {/* CART */}
               <button
                 onClick={() => navigate("/cart")}
-                className={`relative hidden md:flex items-center gap-2 transition-colors ${
+                className={`hidden md:flex items-center gap-2 transition-colors ${
                   scrolled ? "text-gray-800 hover:text-blue-600" : "text-white"
                 }`}
               >
-                <ShoppingCart className="w-5 h-5" />
-                <span className="text-sm">Cart</span>
+                {/* Wrap icon in relative div */}
+                <div className="relative">
+                  <ShoppingCart className="w-5 h-5" />
 
-                {cartItems.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    {cartItems.reduce((t, i) => t + i.quantity, 0)}
-                  </span>
-                )}
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                      {cartItems.reduce((t, i) => t + i.quantity, 0)}
+                    </span>
+                  )}
+                </div>
+
+                <span className="text-md font-semibold">Cart</span>
               </button>
 
               {/* HAMBURGER */}
@@ -196,7 +200,6 @@ function Header() {
               >
                 <Menu className="w-6 h-6" />
               </button>
-
             </div>
           </div>
         </nav>
@@ -217,7 +220,6 @@ function Header() {
         }`}
       >
         <div className="p-6 flex flex-col h-full">
-
           {/* TOP */}
           <div className="flex items-center justify-between mb-6">
             <img src={OptenixBlackLogo} alt="Optenix" className="h-10" />
@@ -276,7 +278,6 @@ function Header() {
             <ShoppingCart className="w-5 h-5" />
             Cart ({cartItems.reduce((t, i) => t + i.quantity, 0)})
           </button>
-
         </div>
       </div>
     </>

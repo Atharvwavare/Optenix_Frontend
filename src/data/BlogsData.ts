@@ -7,7 +7,7 @@ export type BlogPost = {
   date: string;
   category: string;
   readTime: string;
-  url: string;        // 🔥 NEW FIELD
+  url: string;        // NEW FIELD
 };
 
 export const featuredPost: BlogPost = {
@@ -32,7 +32,7 @@ export const posts: BlogPost[] = [
     date: '2024',
     category: 'Artificial Intelligence',
     readTime: '6 min read',
-    url: "https://hbr.org/2023/07/how-ai-is-transforming-business"
+    url: "https://www.bath.ac.uk/campaigns/discover-a-masters-course-in-ai-at-bath/?utm_id=500992&utm_campaign=pg_fos_2026&utm_source=google&utm_medium=cpc&utm_content=aml_india&gad_source=1&gad_campaignid=23077525612&gbraid=0AAAAA9_cgRw1133P1cnT0QU5TOC6WhIwK&gclid=Cj0KCQiA7fbLBhDJARIsAOAqhsdVU1m-NW8qED5C7jTVjiJJDfLTQ0snxP1CRQEPBWW7fexy0yYHAJwaAr2pEALw_wcB"
   },
   {
     id: "cybersecurity",
@@ -87,7 +87,7 @@ export const posts: BlogPost[] = [
     date: '2024',
     category: 'Engineering',
     readTime: '9 min read',
-    url: "https://cloud.google.com/blog/topics/developers-practitioners/scalable-system-design"
+    url: "https://www.geeksforgeeks.org/system-design/what-is-scalability"
   },
 ];
 

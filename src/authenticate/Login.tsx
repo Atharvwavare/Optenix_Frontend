@@ -19,7 +19,7 @@ export default function Login() {
   const state = location.state as any;
 
   // Redirect after login
-  const from = state?.from || "/shop";
+  const from = state?.from || "/";
 
   const validateEmail = (value: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -81,6 +81,8 @@ export default function Login() {
           Login to Optenix
         </h2>
 
+
+    {/* full form */}
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* EMAIL */}
           <div>
@@ -141,6 +143,7 @@ export default function Login() {
           </button>
         </form>
 
+    {/* tagline */}
         <p className="text-center mt-4">
           Don’t have an account?{" "}
           <Link
