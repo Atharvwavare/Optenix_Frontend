@@ -14,6 +14,7 @@ export default function Register() {
 
   //for mobile interface
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -33,6 +34,9 @@ export default function Register() {
     setLoading(true);
 
     try {
+      setError("");
+      setSuccess("");
+
       const res = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
@@ -46,19 +50,26 @@ export default function Register() {
         }),
       });
 
-      // 🔐 SAFETY: handle non-JSON responses
+      const data = await res.json();
+
       if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Registration failed");
+        // 👇 already registered case
+        if (res.status === 409) {
+          setError("You are already registered. Please login.");
+          return;
+        }
+
+        throw new Error(data.message || "Registration failed");
       }
 
+      // ✅ success case
       setSuccess("Registered successfully! Redirecting to login...");
 
       setTimeout(() => {
         navigate("/login");
-      }, 1500);
+      }, 2000);
     } catch (err: any) {
-      alert(err.message || "Something went wrong");
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -72,6 +83,8 @@ export default function Register() {
         {success && (
           <p className="text-green-600 text-center mb-4">{success}</p>
         )}
+
+        {error && <p className="text-red-600 text-center mb-4">{error}</p>}
 
         {/* REGISTER FORM */}
         <form onSubmit={handleSubmit} className="space-y-4">
