@@ -8,6 +8,11 @@ export default function Login() {
   const location = useLocation();
   const { login } = useAuth();
 
+  //for mobile
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error" | "">("");
+  const [loading, setLoading] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -36,43 +41,50 @@ export default function Login() {
     return true;
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!validateEmail(email) || !validatePassword(password)) return;
+    if (!validateEmail(email) || !validatePassword(password)) return;
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-    
-  try {
-    const res = await fetch(`${API_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    setLoading(true);
+    setMessage("");
+    setMessageType("");
 
-    let data;
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
     try {
-      data = await res.json();
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.message || "Invalid email or password");
+        setMessageType("error");
+        return;
+      }
+
+      login(data.user, data.token);
+      setMessage("Login successful! Redirecting...");
+      setMessageType("success");
+
+      setTimeout(() => {
+        if (data.user.role === "admin") {
+          navigate("/admin/dashboard", { replace: true });
+        } else {
+          navigate(from, { replace: true });
+        }
+      }, 1500);
     } catch {
-      throw new Error("Server did not return valid JSON");
+      setMessage("Server error. Please try again.");
+      setMessageType("error");
+    } finally {
+      setLoading(false);
     }
-
-    if (!res.ok) {
-      throw new Error(data.message || "Login failed");
-    }
-
-    login(data.user, data.token);
-
-    if (data.user.role === "admin") {
-      navigate("/admin/dashboard", { replace: true });
-    } else {
-      navigate(from, { replace: true });
-    }
-
-  } catch (err: any) {
-    alert(err.message);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2b0057] to-[#2f1fff] px-4">
@@ -81,8 +93,17 @@ export default function Login() {
           Login to Optenix
         </h2>
 
+        {message && (
+          <p
+            className={`text-center mb-4 ${
+              messageType === "success" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {message}
+          </p>
+        )}
 
-    {/* full form */}
+        {/* full form */}
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* EMAIL */}
           <div>
@@ -137,13 +158,18 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg font-semibold"
+            disabled={loading}
+            className={`w-full py-3 rounded-lg font-semibold text-white ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-600 to-cyan-500"
+            }`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-    {/* tagline */}
+        {/* tagline */}
         <p className="text-center mt-4">
           Don’t have an account?{" "}
           <Link
