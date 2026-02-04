@@ -7,24 +7,23 @@ export default function Register() {
 
   console.log("ENV API URL =", import.meta.env.VITE_API_URL);
 
-  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  //for mobile interface
+  const [success, setSuccess] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL;;
-
-
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // handlesubmit logic
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
 
     if (password !== confirmPassword) {
       alert("Passwords do not match");
@@ -39,7 +38,7 @@ export default function Register() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials:"include",
+        credentials: "include",
         body: JSON.stringify({
           name,
           email,
@@ -53,9 +52,11 @@ export default function Register() {
         throw new Error(text || "Registration failed");
       }
 
-      alert("Registered successfully");
-      navigate("/login");
+      setSuccess("Registered successfully! Redirecting to login...");
 
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err: any) {
       alert(err.message || "Something went wrong");
     } finally {
@@ -66,11 +67,13 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2b0057] to-[#2f1fff] px-4">
       <div className="bg-white p-8 rounded-lg w-full max-w-md shadow">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Register
-        </h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
 
-    {/* REGISTER FORM */}
+        {success && (
+          <p className="text-green-600 text-center mb-4">{success}</p>
+        )}
+
+        {/* REGISTER FORM */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
@@ -136,7 +139,7 @@ export default function Register() {
           </button>
         </form>
 
-    {/* TAGLINE */}
+        {/* TAGLINE */}
         <p className="text-center mt-4">
           Already have an account?{" "}
           <Link to="/login" className="text-blue-600">
