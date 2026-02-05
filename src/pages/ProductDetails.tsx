@@ -2,7 +2,7 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Star, Search } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
-import { getAllProducts } from "../utils/productStore";
+import { fetchProducts, fetchProductById } from "../services/productApi";
 import { Product } from "../types/Product";
 import { useCart } from "../context/CartContext";
 import CartPopup from "../others/CartPopup";
@@ -15,24 +15,41 @@ export default function ProductDetails() {
   const { addToCart } = useCart();
   const { user } = useAuth();
 
-  const allProducts: Product[] = getAllProducts();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [qty, setQty] = useState<number>(1);
-  const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [lastAddedItem, setLastAddedItem] = useState<{
-    id: string;
-    name: string;
-    price: number;
-    image: string;
-    quantity: number;
-  } | null>(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState<any>(null);
 
-  const [query, setQuery] = useState<string>("");
-  const [debouncedQuery, setDebouncedQuery] = useState<string>("");
-
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [showAllSpecs, setShowAllSpecs] = useState<boolean>(false);
+  const [activeImage, setActiveImage] = useState("");
 
-  // -------------------- Debounce search --------------------
+  /* ---------------- Load product ---------------- */
+  useEffect(() => {
+    if (!id) return;
+
+    setLoading(true);
+    fetchProductById(id)
+      .then((data) => {
+        setProduct(data);
+        setActiveImage(data.images?.[0] || data.image);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  /* ---------------- Load all products (search + suggestions) ---------------- */
+  useEffect(() => {
+    fetchProducts()
+      .then(setAllProducts)
+      .catch(console.error);
+  }, []);
+
+  /* ---------------- Debounce search ---------------- */
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query.trim().toLowerCase());
@@ -40,21 +57,16 @@ export default function ProductDetails() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const filteredProducts = useMemo<Product[]>(() => {
+  const filteredProducts = useMemo(() => {
     if (!debouncedQuery) return [];
-    return allProducts.filter((product) =>
-      product.name.toLowerCase().includes(debouncedQuery)
+    return allProducts.filter((p) =>
+      p.name.toLowerCase().includes(debouncedQuery)
     );
   }, [debouncedQuery, allProducts]);
 
-  // -------------------- Find product --------------------
-  const product: Product | undefined = allProducts.find((p) => p.id === id);
-
-  useEffect(() => {
-    setQuery("");
-    setDebouncedQuery("");
-    setQty(1);
-  }, [id]);
+  if (loading) {
+    return <div className="p-20 text-center text-xl">Loading product...</div>;
+  }
 
   if (!product) {
     return (
@@ -64,26 +76,15 @@ export default function ProductDetails() {
     );
   }
 
-  const images: string[] = product.images || [product.image];
-  const [activeImage, setActiveImage] = useState<string>(images[0]);
-
-  useEffect(() => {
-    setActiveImage(images[0]);
-  }, [product]);
-
-  // const visibleSpecs: string[] = showAllSpecs
-  //   ? product.specifications
-  //   : product.specifications.slice(0, 6);
-
-  // -------------------- Price Calculation --------------------
+  /* ---------------- Price ---------------- */
   const basePrice = product.price * qty;
   const gst = Math.round(basePrice * 0.18);
   const finalPrice = basePrice + gst;
 
-  // -------------------- Add To Cart --------------------
+  /* ---------------- Cart ---------------- */
   const handleAddToCart = () => {
     const item = {
-      id: product.id!,
+      id: product._id || product.id,
       name: product.name,
       price: product.price,
       image: activeImage,
@@ -95,72 +96,59 @@ export default function ProductDetails() {
     setTimeout(() => setShowPopup(false), 3000);
   };
 
-  // -------------------- Buy Now --------------------
   const handleBuyNow = () => {
-    const item = {
-      id: product.id!,
+    addToCart({
+      id: product._id || product.id,
       name: product.name,
       price: finalPrice,
       image: activeImage,
       quantity: qty,
-    };
-    addToCart(item);
+    });
 
     if (!user) {
       navigate("/register", {
-        state: {
-          from: location.pathname,
-          redirectTo: `/shop/${product.id}`,
-          productId: product.id,
-        },
+        state: { from: location.pathname },
       });
     } else {
       navigate("/place-order");
     }
   };
 
-  // -------------------- Suggested Products --------------------
-  const suggestions: Product[] = allProducts
-    .filter((p) => p.id !== id)
-    .sort(() => 0.5 - Math.random())
+  /* ---------------- Suggestions ---------------- */
+  const suggestions = allProducts
+    .filter((p) => p._id !== product._id)
     .slice(0, 6);
 
-  // -------------------- Safe rating --------------------
-  const rating: number =
+  const rating =
     typeof product.rating === "number"
       ? product.rating
-      : parseFloat(product.rating as any) || 0; // fallback to 0 if invalid
+      : parseFloat(product.rating as any) || 0;
 
   return (
     <section className="min-h-screen bg-white py-20">
       <div className="container mx-auto px-6">
 
-        {/* Search Bar */}
+        {/* Search */}
         <div className="max-w-xl mx-auto mb-10 relative">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
-            type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type to search products..."
-            className="w-full pl-14 pr-6 py-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Search products..."
+            className="w-full pl-14 pr-6 py-4 rounded-full border"
           />
         </div>
 
         {/* Search Results */}
         {debouncedQuery && filteredProducts.length > 0 && (
           <div className="mb-10 grid grid-cols-2 md:grid-cols-4 gap-6">
-            {filteredProducts.map((p: Product) => (
+            {filteredProducts.map((p) => (
               <div
-                key={p.id}
-                onClick={() => {
-                  setQuery("");
-                  setDebouncedQuery("");
-                  navigate(`/shop/${p.id}`);
-                }}
-                className="border rounded-xl p-3 cursor-pointer hover:shadow-lg transition"
+                key={p._id}
+                onClick={() => navigate(`/shop/${p._id}`)}
+                className="border rounded-xl p-3 cursor-pointer hover:shadow"
               >
-                <img src={p.image} alt={p.name} className="h-28 mx-auto" />
+                <img src={p.image} className="h-28 mx-auto" />
                 <h3 className="text-sm font-semibold">{p.name}</h3>
                 <div className="text-blue-900 font-bold">₹{p.price}</div>
               </div>
@@ -168,38 +156,35 @@ export default function ProductDetails() {
           </div>
         )}
 
-        {/* Product Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start mb-12">
-          {/* Image Gallery */}
+        {/* Product */}
+        <div className="grid lg:grid-cols-2 gap-14">
+          {/* Images */}
           <div>
-            <div className="border rounded-xl p-6 flex justify-center bg-gray-50 mb-4">
-              <img
-                src={activeImage}
-                alt={product.name}
-                className="max-h-[420px] object-contain"
-              />
+            <div className="border rounded-xl p-6 bg-gray-50 mb-4">
+              <img src={activeImage} className="max-h-[420px] mx-auto" />
             </div>
             <div className="flex gap-3 justify-center">
-              {images.map((img: string, idx: number) => (
-                <img
-                  key={idx}
-                  src={img}
-                  onClick={() => setActiveImage(img)}
-                  className={`w-20 h-20 object-contain border rounded cursor-pointer ${
-                    activeImage === img ? "ring-2 ring-blue-500" : ""
-                  }`}
-                />
-              ))}
+              {(product.images?.length ? product.images : [product.image]).map(
+                (img, i) => (
+                  <img
+                    key={i}
+                    src={img}
+                    onClick={() => setActiveImage(img)}
+                    className={`w-20 h-20 border rounded cursor-pointer ${
+                      activeImage === img ? "ring-2 ring-blue-500" : ""
+                    }`}
+                  />
+                )
+              )}
             </div>
           </div>
 
-          {/* Product Info */}
+          {/* Info */}
           <div>
             <h1 className="text-3xl font-semibold mb-3">{product.name}</h1>
 
-            {/* Rating */}
-            <div className="flex items-center gap-1 mb-4">
-              {[...Array(5)].map((_, i: number) => (
+            <div className="flex gap-1 mb-4">
+              {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
                   className={`w-5 h-5 ${
@@ -212,117 +197,64 @@ export default function ProductDetails() {
               <span className="ml-2 text-blue-600">{rating.toFixed(1)}</span>
             </div>
 
-            {/* Price + GST */}
             <div className="border rounded-xl p-4 mb-5 bg-gray-50">
-              <div className="flex justify-between mb-2">
-                <span>Base Price:</span>
-                <span>₹{basePrice}</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>GST (18%):</span>
-                <span>₹{gst}</span>
-              </div>
-              <div className="flex justify-between text-lg font-bold text-blue-800 border-t pt-2">
+              <div className="flex justify-between">
                 <span>Total Price:</span>
-                <span>₹{finalPrice}</span>
+                <span className="font-bold">₹{finalPrice}</span>
               </div>
-              <p className="text-sm text-gray-600 mt-2">* Inclusive of 18% GST</p>
             </div>
 
-            {/* Description & Specs */}
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">Description</h2>
-                <p className="text-black leading-relaxed text-md">{product.description}</p>
-              </div>
+            <p className="mb-6">{product.description}</p>
 
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">Specifications</h2>
-                <ul className="text-gray-900 list-disc pl-5 space-y-1">
-                  {(showAllSpecs ? product.specifications : product.specifications.slice(0, 6))
-                    .map((spec: string, index: number) => (
-                      <li key={index}>{spec}</li>
-                  ))}
-                </ul>
-                {product.specifications.length > 6 && (
-                  <button
-                    onClick={() => setShowAllSpecs(!showAllSpecs)}
-                    className="mt-2 text-blue-600 hover:text-blue-800 font-small"
-                  >
-                    {showAllSpecs ? " ← Show Less " : "Show More →"}
-                  </button>
-                )}
-              </div>
+            <ul className="list-disc pl-5 mb-6">
+              {(showAllSpecs
+                ? product.specifications
+                : product.specifications.slice(0, 6)
+              ).map((s, i) => (
+                <li key={i}>{s}</li>
+              ))}
+            </ul>
 
-              {/* Quantity */}
-              <div className="flex items-center gap-4 mb-6 mt-4">
-                <span className="font-medium">Quantity:</span>
-                <div className="flex items-center border rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setQty((prev) => (prev > 1 ? prev - 1 : 1))}
-                    className="px-4 py-2 text-xl font-bold hover:bg-gray-100"
-                  >
-                    −
-                  </button>
-                  <span className="px-6 py-2 font-semibold">{qty}</span>
-                  <button
-                    onClick={() => setQty((prev) => prev + 1)}
-                    className="px-4 py-2 text-xl font-bold hover:bg-gray-100"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4 mb-6">
-                <button
-                  onClick={handleAddToCart}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 font-semibold rounded flex-1"
-                >
-                  Add to Cart
-                </button>
-                <button
-                  onClick={handleBuyNow}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 font-semibold rounded flex-1"
-                >
-                  Buy Now
-                </button>
-              </div>
-
+            <div className="flex gap-4 mb-6">
               <button
-                onClick={() => navigate("/shop")}
-                className="text-blue-600 hover:underline"
+                onClick={handleAddToCart}
+                className="bg-blue-600 text-white px-4 py-3 rounded flex-1"
               >
-                ← Back to Shop
+                Add to Cart
+              </button>
+              <button
+                onClick={handleBuyNow}
+                className="bg-green-600 text-white px-4 py-3 rounded flex-1"
+              >
+                Buy Now
               </button>
             </div>
+
+            <button onClick={() => navigate("/shop")} className="text-blue-600">
+              ← Back to Shop
+            </button>
           </div>
         </div>
 
-        {/* Suggested Products */}
-        <h2 className="text-2xl font-semibold mb-6">You might also like</h2>
+        {/* Suggestions */}
+        <h2 className="text-2xl font-semibold mt-16 mb-6">You might also like</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {suggestions.map((p: Product) => (
+          {suggestions.map((p) => (
             <div
-              key={p.id}
-              onClick={() => navigate(`/shop/${p.id}`)}
-              className="border rounded-xl p-4 cursor-pointer hover:shadow-lg transition flex flex-col items-center bg-white"
+              key={p._id}
+              onClick={() => navigate(`/shop/${p._id}`)}
+              className="border rounded-xl p-4 cursor-pointer hover:shadow"
             >
-              <div className="w-full h-32 flex items-center justify-center bg-gray-50 rounded mb-3">
-                <img src={p.image} alt={p.name} className="max-h-28 object-contain" />
-              </div>
-              <h3 className="text-sm font-medium text-gray-900 text-center mb-1">{p.name}</h3>
-              <div className="text-blue-900 font-bold">₹{p.price}</div>
+              <img src={p.image} className="h-28 mx-auto" />
+              <h3 className="text-sm font-medium text-center">{p.name}</h3>
+              <div className="text-blue-900 font-bold text-center">₹{p.price}</div>
             </div>
           ))}
         </div>
 
-        {/* Cart Popup */}
         {showPopup && lastAddedItem && (
           <CartPopup item={lastAddedItem} onClose={() => setShowPopup(false)} />
         )}
-
       </div>
     </section>
   );

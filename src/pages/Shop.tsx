@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Star, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-// import { getAllProducts } from "../utils/productStore";
+import { fetchProducts } from "../services/productApi";
 import { Product } from "../types/Product";
 
 export default function Shop() {
@@ -16,29 +16,11 @@ export default function Shop() {
   const [loading, setLoading] = useState(true);
 
   /* -------------------- Load Products -------------------- */
- const API_URL = import.meta.env.VITE_API_URL;
-
-useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-
-      const res = await fetch(`${API_URL}/api/products`);
-      if (!res.ok) {
-        throw new Error("Failed to fetch products");
-      }
-
-      const data = await res.json();
-      setProducts(data);
-
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchProducts();
+  useEffect(() => {
+  fetchProducts()
+    .then((data) => setProducts(data))
+    .catch(console.error)
+    .finally(() => setLoading(false));
 }, []);
 
 
