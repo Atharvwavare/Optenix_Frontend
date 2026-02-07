@@ -16,12 +16,22 @@ export default function Shop() {
   const [loading, setLoading] = useState(true);
 
   /* -------------------- Load Products -------------------- */
-  useEffect(() => {
-  fetchProducts()
-    .then((data) => setProducts(data))
-    .catch(console.error)
-    .finally(() => setLoading(false));
+ useEffect(() => {
+  const loadProducts = async () => {
+    setLoading(true);
+    const data = await fetchProducts()
+      setProducts(data);
+      setLoading(false);
+  };
+
+  loadProducts();
+
+  // 🔥 auto refresh when admin adds product
+  window.addEventListener("product-updated", loadProducts);
+  return () =>
+    window.removeEventListener("product-updated", loadProducts);
 }, []);
+
 
 
   /* -------------------- Debounce Search -------------------- */
@@ -43,11 +53,11 @@ export default function Shop() {
 
   /* -------------------- UI -------------------- */
   return (
-    <section className="min-h-screen bg-gradient-to-b from-white to-blue-50 py-20">
-      <div className="container mx-auto px-6">
+    <section className="min-h-screen overflow-hidden">
+      <div className="container mx-auto">
         {/* Title */}
         <motion.div
-          className="text-center mb-12"
+          className="text-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 py-20"
           initial={{ opacity: 0, y: -40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -114,8 +124,8 @@ export default function Shop() {
 
               return (
                 <motion.div
-                  key={product.id}
-                  onClick={() => navigate(`/shop/${product.id}`)}
+                  key={product._id}
+                  onClick={() => navigate(`/shop/${product._id}`)}
                   className="bg-white rounded-2xl border shadow-sm hover:shadow-xl
                              p-4 flex flex-col transition cursor-pointer"
                   initial={{ opacity: 0, y: 30 }}
@@ -174,7 +184,7 @@ export default function Shop() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/shop/${product.id}`);
+                      navigate(`/shop/${product._id}`);
                     }}
                     className="mt-auto bg-blue-600 hover:bg-blue-700 text-white
                                font-semibold py-2 rounded-full transition"

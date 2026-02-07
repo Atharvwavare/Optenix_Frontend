@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import { getAllProducts, saveAdminProducts } from "../utils/productStore";
-import { Product } from "../types/Product";
+import { Product, ProductForm } from "../types/Product";
 
-// product inputs
-const emptyProduct: Product = {
+/* ---------------- EMPTY PRODUCT ---------------- */
+const emptyProduct: ProductForm = {
   name: "",
   image: "",
   images: [],
   price: 0,
   originalPrice: 0,
-  rating: 0,
+  rating: 3.5,
   discount: "",
   description: "",
   specifications: [],
@@ -17,12 +16,14 @@ const emptyProduct: Product = {
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [form, setForm] = useState<Product>(emptyProduct);
+  const [form, setForm] = useState<ProductForm>(emptyProduct);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
-    setProducts(getAllProducts());
+    fetch("http://localhost:5000/api/products")
+      .then(res => res.json())
+      .then(setProducts);
   }, []);
 
   /* ---------------- IMAGE → BASE64 ---------------- */
@@ -46,10 +47,10 @@ export default function AdminProducts() {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (!e.target.files) return;
-    const base64Images = await Promise.all(
+    const images = await Promise.all(
       Array.from(e.target.files).map(fileToBase64)
     );
-    setForm(prev => ({ ...prev, images: base64Images }));
+    setForm(prev => ({ ...prev, images }));
   };
 
   /* ---------------- FORM HANDLING ---------------- */
@@ -59,53 +60,83 @@ export default function AdminProducts() {
     const { name, value } = e.target;
 
     if (name === "specifications") {
-      setForm(prev => ({ ...prev, specifications: value.split(",") }));
-    } else {
-      setForm(prev => ({ ...prev, [name]: value }));
+      setForm(prev => ({
+        ...prev,
+        specifications: value.split(","),
+      }));
+      return;
     }
+
+    setForm(prev => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  /* ---------------- CRUD ---------------- */
-  // ADD product
-  const addProduct = () => {
-    const newProduct: Product = {
-      ...form,
-      id: "admin-" + Date.now(),
-    };
+  /* ---------------- ADD PRODUCT ---------------- */
+  const addProduct = async () => {
+    if (!form.image) {
+      alert("Please upload a main image");
+      return;
+    }
 
-    const updated = [...products, newProduct];
-    setProducts(updated);
-    saveAdminProducts(updated.filter(p => !p.id?.startsWith("base-")));
+    const res = await fetch("http://localhost:5000/api/products/admin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+      },
+      body: JSON.stringify({
+        ...form,
+        price: Number(form.price),
+        originalPrice: Number(form.originalPrice),
+        isActive: true,
+        status: "published",
+      }),
+    });
+
+    if (!res.ok) return;
+
+    const saved = await res.json();
+    setProducts(prev => [saved, ...prev]);
     resetForm();
   };
-  // UPDATE product
-  const updateProduct = () => {
+
+  /* ---------------- UPDATE PRODUCT ---------------- */
+  const updateProduct = async () => {
     if (!editingId) return;
 
-    const updated = products.map(p =>
-      p.id === editingId ? { ...form, id: editingId } : p
+    const res = await fetch(
+      `http://localhost:5000/api/products/admin/${editingId}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
     );
 
-    setProducts(updated);
-    saveAdminProducts(updated.filter(p => !p.id?.startsWith("base-")));
-    resetForm();
-  }; 
-  // DELETE product
-  const deleteProduct = (id?: string) => {
-    if (!id) return;
-    if (id.startsWith("base-")) return;
+    const data = await res.json();
+    setProducts(prev =>
+      prev.map(p => (p._id === editingId ? data : p))
+    );
 
-    const updated = products.filter(p => p.id !== id);
-    setProducts(updated);
-    saveAdminProducts(updated.filter(p => !p.id?.startsWith("base-")));
+    resetForm();
   };
 
-  const startEdit = (product: Product) => {
-    if (!product.id) return;
-    if (product.id.startsWith("base-")) return;
+  /* ---------------- DELETE PRODUCT ---------------- */
+  const deleteProduct = async (id?: string) => {
+    if (!id) return;
+    await fetch(`http://localhost:5000/api/products/admin/${id}`, {
+      method: "DELETE",
+    });
+    setProducts(prev => prev.filter(p => p._id !== id));
+  };
 
-    setEditingId(product.id);
-    setForm(product);
+  /* ---------------- EDIT ---------------- */
+  const startEdit = (product: Product) => {
+    setEditingId(product._id);
+    const { _id, ...rest } = product;
+    setForm(rest);
   };
 
   const resetForm = () => {
@@ -113,205 +144,163 @@ export default function AdminProducts() {
     setEditingId(null);
   };
 
- 
   /* ---------------- UI ---------------- */
-return (
-  <div className="p-3 sm:p-4 md:p-6 max-w-6xl mx-auto">
-    <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-black justify-center">
-      Admin Product Management
-    </h1>
+  return (
+    <div className="p-4 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Admin Product Management</h1>
 
-    {/* ---------------- FORM ---------------- */}
-    <div className="bg-white rounded-xl shadow p-4 sm:p-6 mb-8">
-      <h2 className="text-lg sm:text-xl font-semibold mb-4">
-        {editingId ? "Edit Product" : "Add New Product"}
-      </h2>
+      {/* FORM */}
+      <div className="bg-white p-6 rounded shadow mb-8">
+        <h2 className="text-xl font-semibold mb-4">
+          {editingId ? "Edit Product" : "Add Product"}
+        </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Product name"
-          className="border rounded-lg p-3 w-full"
-        />
-
-        <input
-          type="number"
-          name="price"
-          value={form.price}
-          onChange={handleChange}
-          placeholder="Selling price (₹)"
-          className="border rounded-lg p-3 w-full"
-        />
-
-        <input
-          type="number"
-          name="originalPrice"
-          value={form.originalPrice}
-          onChange={handleChange}
-          placeholder="Original price (₹)"
-          className="border rounded-lg p-3 w-full"
-        />
-
-        <input
-          type="number"
-          step="0.1"
-          name="rating"
-          value={form.rating}
-          onChange={handleChange}
-          placeholder="Rating (0 - 5)"
-          className="border rounded-lg p-3 w-full"
-        />
-
-        <input
-          name="discount"
-          value={form.discount}
-          onChange={handleChange}
-          placeholder="Discount (e.g. 20% OFF)"
-          className="border rounded-lg p-3 w-full"
-        />
-
-        {/* IMAGE INPUTS */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-1">
-            Main Image
-          </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
-            type="file"
-            accept="image/*"
-            onChange={handleMainImageChange}
-            className="border rounded-lg p-2 w-full"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Product Name"
+            className="border p-2"
           />
-        </div>
 
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-1">
-            Gallery Images
-          </label>
           <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleGalleryChange}
-            className="border rounded-lg p-2 w-full"
+            type="text"
+            placeholder="Price (₹)"
+            value={form.price || ""}
+            onChange={e =>
+              setForm({ ...form, price: Number(e.target.value) || 0 })
+            }
+            className="border p-2"
           />
-        </div>
 
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          placeholder="Product description"
-          className="border rounded-lg p-3 md:col-span-2"
-          rows={3}
-        />
+          <input
+            type="text"
+            placeholder="Original Price (₹)"
+            value={form.originalPrice || ""}
+            onChange={e =>
+              setForm({ ...form, originalPrice: Number(e.target.value) || 0 })
+            }
+            className="border p-2"
+          />
 
-        <textarea
-          name="specifications"
-          value={form.specifications.join(",")}
-          onChange={handleChange}
-          placeholder="Specifications (comma separated)"
-          className="border rounded-lg p-3 md:col-span-2"
-          rows={2}
-        />
+          {/* Rating Control */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() =>
+                setForm(prev => ({
+                  ...prev,
+                  rating: Math.max(1, prev.rating - 0.5),
+                }))
+              }
+              className="px-3 py-1 border rounded text-lg font-bold"
+            >
+              −
+            </button>
 
-        <button
-          onClick={editingId ? updateProduct : addProduct}
-          className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg md:col-span-2 font-semibold"
-        >
-          {editingId ? "Update Product" : "Add Product"}
-        </button>
-      </div>
-    </div>
+            <input
+              value={form.rating.toFixed(1)}
+              readOnly
+              className="w-20 text-center border rounded py-1"
+            />
 
-    {/* ---------------- LIST ---------------- */}
-    <div className="bg-white rounded-xl shadow">
-      {/* Mobile Card View */}
-      <div className="md:hidden">
-        {products.map(p => (
-          <div key={p.id ?? p.name} className="border-b p-4">
-            <div className="flex gap-4">
-              {p.image && (
-                <img
-                  src={p.image}
-                  className="h-16 w-16 object-cover rounded"
-                />
-              )}
-
-              <div className="flex-1">
-                <p className="font-semibold text-lg">{p.name}</p>
-                <p className="text-gray-600">₹{p.price}</p>
-
-                {!p.id?.startsWith("base-") && (
-                  <div className="flex gap-2 mt-3">
-                    <button
-                      onClick={() => startEdit(p)}
-                      className="flex-1 bg-yellow-500 text-white py-2 rounded"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => deleteProduct(p.id)}
-                      className="flex-1 bg-red-600 text-white py-2 rounded"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() =>
+                setForm(prev => ({
+                  ...prev,
+                  rating: Math.min(5, prev.rating + 0.5),
+                }))
+              }
+              className="px-3 py-1 border rounded text-lg font-bold"
+            >
+              +
+            </button>
           </div>
-        ))}
+
+          <input
+            name="discount"
+            value={form.discount}
+            onChange={handleChange}
+            placeholder="Discount"
+            className="border p-2"
+          />
+
+          <div>
+            <label className="text-sm font-medium">Main Image</label>
+            <input type="file" accept="image/*" onChange={handleMainImageChange} />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Gallery Images</label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleGalleryChange}
+            />
+          </div>
+
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            placeholder="Description"
+            className="border p-2 md:col-span-2"
+          />
+
+          <textarea
+            name="specifications"
+            value={form.specifications.join(",")}
+            onChange={handleChange}
+            placeholder="Specs (comma separated)"
+            className="border p-2 md:col-span-2"
+          />
+
+          <button
+            onClick={editingId ? updateProduct : addProduct}
+            className="bg-blue-600 text-white py-2 rounded md:col-span-2"
+          >
+            {editingId ? "Update Product" : "Add Product"}
+          </button>
+        </div>
       </div>
 
-      {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="min-w-full border-collapse">
+      {/* TABLE */}
+      <div className="bg-white rounded shadow overflow-x-auto">
+        <table className="min-w-full">
           <thead className="bg-gray-100">
             <tr>
-              <th className="border p-3 text-left">Image</th>
-              <th className="border p-3 text-left">Name</th>
-              <th className="border p-3 text-left">Price</th>
-              <th className="border p-3 text-left">Actions</th>
+              <th className="p-3 text-left">Image</th>
+              <th className="p-3 text-left">Name</th>
+              <th className="p-3 text-left">Price</th>
+              <th className="p-3 text-left">Actions</th>
             </tr>
           </thead>
-
           <tbody>
             {products.map(p => (
-              <tr key={p.id ?? p.name} className="hover:bg-gray-50">
-                <td className="border p-2">
+              <tr key={p._id}>
+                <td className="p-2">
                   {p.image && (
-                    <img
-                      src={p.image}
-                      className="h-12 w-12 object-cover rounded"
-                    />
+                    <img src={p.image} className="h-12 w-12 rounded object-cover" />
                   )}
                 </td>
-
-                <td className="border p-2">{p.name}</td>
-
-                <td className="border p-2 font-medium">₹{p.price}</td>
-
-                <td className="border p-2 space-x-2">
-                  {!p.id?.startsWith("base-") && (
-                    <>
-                      <button
-                        onClick={() => startEdit(p)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        onClick={() => deleteProduct(p.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
-                      >
-                        Delete
-                      </button>
-                    </>
-                  )}
+                <td className="p-2">{p.name}</td>
+                <td className="p-2">₹{p.price}</td>
+                <td className="p-2 space-x-2">
+                  <button
+                    onClick={() => startEdit(p)}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteProduct(p._id)}
+                    className="bg-red-600 text-white px-3 py-1 rounded"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -319,6 +308,5 @@ return (
         </table>
       </div>
     </div>
-  </div>
-);
+  );
 }

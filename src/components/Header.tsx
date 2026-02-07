@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import OptenixLogo from "../images/OptenixWhite.png";
 import OptenixBlackLogo from "../images/OptenixBlack.png";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,10 +16,13 @@ function Header() {
   const navigate = useNavigate();
   const { cartItems } = useCart();
 
+
+  const { user, logout } = useAuth();
+
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Dummy user from localStorage
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+ 
 
   // Scroll effect (only background + shadow, no width change)
   useEffect(() => {
@@ -55,10 +60,11 @@ function Header() {
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    setShowUserMenu(false);
-    navigate("/login");
-  };
+  logout(); // clears user + token + state
+  setShowUserMenu(false);
+  navigate("/login");
+};
+
 
   return (
     <>

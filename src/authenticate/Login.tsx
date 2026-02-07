@@ -56,10 +56,13 @@ export default function Login() {
       const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
+      console.log("LOGIN RESPONSE:", data);
+
 
       if (!res.ok) {
         setMessage(data.message || "Invalid email or password");

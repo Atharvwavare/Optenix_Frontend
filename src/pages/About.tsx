@@ -100,7 +100,7 @@ export default function About() {
         animate="visible"
         variants={fadeUp}
       >
-        <div className="container mx-auto px-6 text-center max-w-4xl">
+        <div className="container mx-auto px-6 text-center max-w-4xl ">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             About Opt
             <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">

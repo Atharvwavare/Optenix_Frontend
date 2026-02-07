@@ -3,6 +3,7 @@
 export type ServiceItem = {
   title: string;
   desc: string;
+  videos?:string[];
 };
 
 export type ServiceGroup = {
@@ -20,14 +21,17 @@ export const services: ServiceGroup[] = [
       {
         title: "Smart Classroom Solutions",
         desc: "Interactive Flat Panels (IFP), digital podiums with integrated sound systems, and high-speed document cameras bring subjects to life.",
+        videos:["https://www.youtube.com/watch?v=O1svaH1144o"],
       },
       {
         title: "Hybrid Classroom Solutions",
         desc: "Bridge the gap between physical and remote students with auto-tracking AI cameras and synchronized audio.",
+        videos:["https://www.youtube.com/watch?v=rkMc8o2KxKw"],
       },
       {
         title: "LMS (Learning Management System)",
         desc: "Centralized hub for curriculum, assessments, progress tracking, and analytics.",
+        videos:["https://www.youtube.com/watch?v=402Th-dUjHs"],
       },
     ],
   },

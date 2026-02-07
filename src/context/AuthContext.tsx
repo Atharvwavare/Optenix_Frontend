@@ -11,7 +11,7 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  loading: boolean;                 // 🔥 important
+  loading: boolean;
   login: (userData: User, token: string) => void;
   logout: () => void;
   updateUser: (userData: User) => void;
@@ -22,32 +22,32 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);   // 🔥 new
+  const [loading, setLoading] = useState(true);
 
-  // 🔁 Restore login state on refresh
+  // 🔁 Restore auth on refresh
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("auth_user");
+    const storedToken = localStorage.getItem("auth_token");
 
     if (storedUser) setUser(JSON.parse(storedUser));
     if (storedToken) setToken(storedToken);
 
-    setLoading(false);   // 🔥 finished restoring
+    setLoading(false);
   }, []);
 
   // ✅ LOGIN
-  const login = (userData: User, authToken: string) => {
+  const login = (userData: User, jwtToken: string) => {
     setUser(userData);
-    setToken(authToken);
+    setToken(jwtToken);
 
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", authToken);
+    localStorage.setItem("auth_user", JSON.stringify(userData));
+    localStorage.setItem("auth_token", jwtToken);
   };
 
-  // ✅ UPDATE USER (profile, address, mobile etc.)
+  // ✅ UPDATE USER
   const updateUser = (userData: User) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("auth_user", JSON.stringify(userData));
   };
 
   // ✅ LOGOUT
@@ -55,8 +55,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
     setToken(null);
 
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.removeItem("auth_user");
+    localStorage.removeItem("auth_token");
   };
 
   return (
@@ -70,6 +70,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used inside AuthProvider");
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
   return context;
 };

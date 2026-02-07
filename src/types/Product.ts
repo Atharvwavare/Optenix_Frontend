@@ -1,7 +1,7 @@
 // src/types/Product.ts
+// fixed
 export interface Product {
-  _id?: string;
-  id: string;
+  _id: string;
   name: string;
   image: string;
   images: string[];
@@ -12,3 +12,6 @@ export interface Product {
   description: string;
   specifications: string[];
 }
+
+// 🔥 FORM TYPE (no _id)
+export type ProductForm = Omit<Product, "_id">;

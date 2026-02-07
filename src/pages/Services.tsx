@@ -43,8 +43,11 @@ export default function Services() {
             <h2 className="text-2xl font-semibold text-blue-800 mb-2 text-center">
               {group.section}
             </h2>
-            <p className="text-black text-lg mb-6 text-center">{group.description}</p>
+            <p className="text-black text-lg mb-6 text-center">{group.description}
+            </p>
+            
 
+            
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               initial="hidden"
@@ -83,14 +86,23 @@ export default function Services() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <a
+      <a
   href="https://docs.google.com/forms/d/e/1FAIpQLSdOsNrVjj5kOiI2SAdrRhXLXkHHYEFZnTO0urGXuoQq5IAYiA/viewform"
   target="_blank"
   rel="noopener noreferrer"
-  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-700 text-white font-medium hover:bg-blue-800 transition"
+  className="
+    text-center
+     pl-4 pr-4  py-3
+    bg-blue-600 text-white
+    font-semibold
+    rounded-lg
+    hover:bg-blue-700
+    transition
+  "
 >
-Get a Free Quote
+  Get a Free Quote
 </a>
+
 
         </motion.div>
       </div>
