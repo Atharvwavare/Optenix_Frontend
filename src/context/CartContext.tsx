@@ -19,28 +19,34 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();   // 🔥 include loading
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // ✅ Load cart ONLY when user is available
+  // 🔁 LOAD CART AFTER AUTH IS READY
   useEffect(() => {
-    if (!user?.email) return;
+    if (loading) return;  // ⛔ wait until auth is restored
+
+    if (!user?.email) {
+      setCartItems([]);
+      return;
+    }
 
     const savedCart = localStorage.getItem(`cart_${user.email}`);
     setCartItems(savedCart ? JSON.parse(savedCart) : []);
-  }, [user?.email]);
 
-  // ✅ Save cart whenever it changes
+  }, [user, loading]);
+
+  // 💾 SAVE CART (per user)
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.email || loading) return;
 
     localStorage.setItem(
       `cart_${user.email}`,
       JSON.stringify(cartItems)
     );
-  }, [cartItems, user?.email]);
+  }, [cartItems, user, loading]);
 
-  // ---------------- ADD ----------------
+  // ➕ ADD
   const addToCart = (item: CartItem) => {
     setCartItems(prev => {
       const existing = prev.find(p => p.id === item.id);
@@ -57,12 +63,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // ---------------- REMOVE ----------------
+  // ❌ REMOVE
   const removeFromCart = (id: string) => {
     setCartItems(prev => prev.filter(item => item.id !== id));
   };
 
-  // ---------------- CLEAR (logout / manual) ----------------
+  // 🧹 CLEAR
   const clearCart = () => {
     setCartItems([]);
 
@@ -82,8 +88,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
 export function useCart() {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used inside CartProvider");
-  }
+  if (!context) throw new Error("useCart must be used inside CartProvider");
   return context;
 }

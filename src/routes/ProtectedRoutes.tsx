@@ -9,7 +9,7 @@ export default function ProtectedRoute({ children }: Props) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  // ⏳ While restoring user from localStorage, wait
+  // ⏳ Wait until auth state is restored
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-lg">
@@ -18,19 +18,14 @@ export default function ProtectedRoute({ children }: Props) {
     );
   }
 
-  // ❌ If NOT logged in → redirect to login
-  // and SAVE the page user was trying to open
+  // ❌ Not logged in → redirect to login
   if (!user) {
-    // Redirect to REGISTER instead of login
     return (
       <Navigate
-      to="/login"
-      state={{
-        from: location.pathname,        // where user came from (ex: /cart)
-        redirectTo: location.pathname,  // where user MUST go after login (ex: /place-order)
-      }}
-      replace
-    />
+        to="/login"
+        replace
+        state={{ from: location.pathname }}
+      />
     );
   }
 

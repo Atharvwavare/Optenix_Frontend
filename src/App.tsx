@@ -57,7 +57,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
 
           {/* Orders */}
-          <Route path="/place-order" element={<PlaceOrder />} />
+          <Route path="/place-order" element={<ProtectedRoute><PlaceOrder /></ProtectedRoute>} />
           <Route
             path="/confirm-order"
             element={

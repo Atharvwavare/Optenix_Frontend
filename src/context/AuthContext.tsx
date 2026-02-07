@@ -52,12 +52,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // ✅ LOGOUT
   const logout = () => {
-    setUser(null);
-    setToken(null);
+  if (user?.email) {
+    localStorage.removeItem(`cart_${user.email}`); // 🧹 clear user cart
+  }
 
-    localStorage.removeItem("auth_user");
-    localStorage.removeItem("auth_token");
-  };
+  setUser(null);
+  setToken(null);
+
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+};
+
 
   return (
     <AuthContext.Provider
